@@ -9,10 +9,10 @@ class RouterPluginImpl {
         this.callNative = callNative;
     }
     async route(url) {
-        await this.callNative('Router', 'route', url);
+        await this.callNative('Router', 'route', { url });
     }
-    async dismiss(data) {
-        await this.callNative('Router', 'dismiss', data);
+    async dismiss() {
+        await this.callNative('Router', 'dismiss', {});
     }
     async dismissLoading() {
         await this.callNative('Router', 'dismissLoading', {});
@@ -25,7 +25,7 @@ class PreferencePluginImpl {
     }
     async readValues(keys) {
         try {
-            const data = await this.callNative('Preference', 'readValues', keys);
+            const data = await this.callNative('Preference', 'readValues', { keys });
             if (data) {
                 this.platformInfo = { ...this.platformInfo, ...data };
             }
@@ -122,8 +122,8 @@ class Bridge {
     get pointsDescDoneBtn() {
         return this.platformInfo.pointsDescDoneBtn;
     }
-    async dismiss(data) {
-        await this.router.dismiss(data);
+    async dismiss() {
+        await this.router.dismiss();
     }
 }
 exports.Bridge = Bridge;

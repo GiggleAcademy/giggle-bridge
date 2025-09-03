@@ -15,7 +15,7 @@ interface PlatformInfo {
 }
 interface RouterPlugin {
     route(url: string): Promise<void>;
-    dismiss(data?: any): Promise<void>;
+    dismiss(): Promise<void>;
     dismissLoading(): Promise<void>;
 }
 interface PreferencePlugin {
@@ -43,7 +43,7 @@ declare class Bridge {
     requestPlatformInfo(success: (info: PlatformInfo) => void, fail?: (error: any) => void): void;
     forceRefreshPlatformInfo(): Promise<PlatformInfo>;
     get pointsDescDoneBtn(): string;
-    dismiss(data?: any): Promise<void>;
+    dismiss(): Promise<void>;
 }
 declare const bridge: Bridge;
 export { PlatformInfo, Bridge, RouterPlugin, PreferencePlugin };

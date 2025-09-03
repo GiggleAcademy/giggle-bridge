@@ -25,7 +25,7 @@ type CallNativeFn = (plugin: string, method: string, params?: any) => Promise<an
 // Plugin interfaces
 interface RouterPlugin {
   route(url: string): Promise<void>
-  dismiss(data?: any): Promise<void>
+  dismiss(): Promise<void>
   dismissLoading(): Promise<void>
 }
 
@@ -42,11 +42,11 @@ class RouterPluginImpl implements RouterPlugin {
   }
 
   public async route(url: string): Promise<void> {
-    await this.callNative('Router', 'route', url)
+    await this.callNative('Router', 'route', { url })
   }
 
-  public async dismiss(data?: any): Promise<void> {
-    await this.callNative('Router', 'dismiss', data)
+  public async dismiss(): Promise<void> {
+    await this.callNative('Router', 'dismiss', {  })
   }
 
   public async dismissLoading(): Promise<void> {
@@ -63,9 +63,9 @@ class PreferencePluginImpl implements PreferencePlugin {
     this.platformInfo = { ...defaultPlatformInfo }
   }
 
-  public async readValues(keys: string[]): Promise<PlatformInfo> {
+  public async readValues(keys?: string[]): Promise<PlatformInfo> {
     try {
-      const data = await this.callNative('Preference', 'readValues', keys)
+      const data = await this.callNative('Preference', 'readValues', { keys })
       if (data) {
         this.platformInfo = { ...this.platformInfo, ...data }
       }
@@ -210,8 +210,8 @@ class Bridge {
   }
 
   // Navigation control
-  public async dismiss(data?: any): Promise<void> {
-    await this.router.dismiss(data)
+  public async dismiss(): Promise<void> {
+    await this.router.dismiss()
   }
 }
 
