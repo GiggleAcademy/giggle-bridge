@@ -24,10 +24,11 @@ type CallNativeFn = (plugin: string, method: string, params?: any) => Promise<an
 interface RouterPlugin {
   route(url: string): Promise<void>
   dismiss(data?: any): Promise<void>
+  dismissLoading(): Promise<void>
 }
 
 interface PreferencePlugin {
-  readValues(keys: string[]): Promise<PlatformInfo>
+  readValues(keys?: string[]): Promise<PlatformInfo>
   getPointsDescDoneBtn(): string
   updatePlatformInfo(newInfo: Partial<PlatformInfo>): void
   getPlatformInfo(): PlatformInfo
@@ -47,6 +48,10 @@ class RouterPluginImpl implements RouterPlugin {
 
   public async dismiss(data?: any): Promise<void> {
     await this.callNative('Router', 'dismiss', data)
+  }
+
+  public async dismissLoading(): Promise<void> {
+    await this.callNative('Router', 'dismissLoading', {})
   }
 }
 
@@ -184,12 +189,15 @@ class Bridge {
     await this.router.route('giggleacademy://unity/flashcardLearning')
   }
 
+  // Loading control
+  public async dismissLoading(): Promise<void> {
+    await this.router.dismissLoading()
+  }
+
   // Private method to fetch platform info from native
   private async _fetchPlatformInfo(): Promise<PlatformInfo> {
-    // 获取PlatformInfo的所有key作为参数 - 业务逻辑在Bridge层处理
-    const platformInfoKeys = Object.keys(this.platformInfo)
     
-    const info = await this.preference.readValues(platformInfoKeys)
+    const info = await this.preference.readValues()
     // Update bridge's platform info
     this.platformInfo = { ...this.platformInfo, ...info }
     this.isPlatformInited = true
