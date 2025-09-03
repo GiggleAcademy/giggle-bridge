@@ -3,8 +3,8 @@
     "target": "ES2020",
     "module": "CommonJS",
     "lib": ["ES2020", "DOM"],
-    "outDir": "./",
-    "rootDir": "./",
+    "outDir": "./dist",
+    "rootDir": "./src",
     "strict": true,
     "esModuleInterop": true,
     "skipLibCheck": true,
@@ -15,12 +15,10 @@
     "removeComments": true
   },
   "include": [
-    "index.ts",
-    "native-bridge.ts"
+    "src/**/*"
   ],
   "exclude": [
     "node_modules",
-    "*.js",
-    "*.d.ts"
+    "dist"
   ]
 }

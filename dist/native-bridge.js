@@ -1,0 +1,79 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.initializeNativeBridge = initializeNativeBridge;
+function initializeNativeBridge() {
+    if (typeof window === 'undefined')
+        return;
+    window.GiggleBridge = {
+        callbacks: {},
+        callbackId: 0,
+        callNative: function (plugin, method, params) {
+            return new Promise((resolve, reject) => {
+                const callbackId = 'cb_' + Date.now() + '_' + Math.random().toString(36).substr(2, 5);
+                this.callbacks[callbackId] = { resolve, reject };
+                const message = {
+                    plugin: plugin,
+                    method: method,
+                    params: params || {},
+                    callbackId: callbackId
+                };
+                if (window.webkit?.messageHandlers?.giggleBridge) {
+                    window.webkit.messageHandlers.giggleBridge.postMessage(message);
+                }
+                else if (window.giggleBridge && window.giggleBridge.postMessage) {
+                    try {
+                        window.giggleBridge.postMessage(JSON.stringify(message));
+                    }
+                    catch (error) {
+                        console.error('处理 Android 消息时出错:', error);
+                        reject(error);
+                        return;
+                    }
+                }
+                else {
+                    console.warn('Native bridge not available');
+                    reject(new Error('Native bridge not available'));
+                }
+            });
+        },
+        handleCallback: function (callbackId, response) {
+            const callback = this.callbacks[callbackId];
+            if (callback) {
+                if (response.error) {
+                    callback.reject(response.error);
+                }
+                else {
+                    callback.resolve(response.data);
+                }
+                delete this.callbacks[callbackId];
+            }
+        },
+        receiveNativeCall: function (method, data) {
+            if (window.__nativeCallBack && window.__nativeCallBack[method]) {
+                return window.__nativeCallBack[method](data);
+            }
+            return null;
+        }
+    };
+    if (window.webkit?.messageHandlers?.giggleCallback) {
+        window.webkit.messageHandlers.giggleCallback.addMessageListener(function (message) {
+            if (message.callbackId && message.response) {
+                window.GiggleBridge.handleCallback(message.callbackId, message.response);
+            }
+        });
+    }
+    window.handleGiggleCallback = function (message) {
+        try {
+            const parsedMessage = JSON.parse(message);
+            if (parsedMessage.callbackId && parsedMessage.response) {
+                window.GiggleBridge.handleCallback(parsedMessage.callbackId, parsedMessage.response);
+            }
+        }
+        catch (error) {
+            console.error('处理 Android 回调时出错:', error);
+        }
+    };
+}
+if (typeof window !== 'undefined') {
+    initializeNativeBridge();
+}
