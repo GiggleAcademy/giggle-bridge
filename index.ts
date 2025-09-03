@@ -1,3 +1,5 @@
+import './native-bridge'
+
 const IS_TEST = process.env.NODE_ENV === 'test'
 const IS_DEV = process.env.NODE_ENV === 'development'
 
@@ -76,10 +78,10 @@ class PreferencePluginImpl implements PreferencePlugin {
 
 }
 
-// Global window interface
+// Global window interface - Bridge实例（业务层）
 declare global {
   interface Window {
-    GiggleBridge: Bridge
+    GiggleBridgeAPI?: Bridge  // 重命名避免类型冲突
   }
 }
 
@@ -124,38 +126,14 @@ class Bridge {
   public callNative(plugin: string, method: string, params?: any): Promise<any> {
     console.log(`🚀 GiggleBridge.callNative: ${plugin}.${method}`, params)
     
-    return new Promise((resolve, reject) => {
-      try {
-        // 这里是调用原生代码的入口点
-        // 具体实现由原生端提供
-        if (typeof (window as any).webkit !== 'undefined') {
-          // iOS WebKit 调用
-          const message = {
-            plugin,
-            method,
-            params
-          }
-          const result = ((window as any).webkit?.messageHandlers?.aitutorCallback as any)?.postMessage?.(message)
-          // 假设原生返回Promise或立即resolve
-          resolve(result)
-        } else if (typeof (window as any).aitutorCallback !== 'undefined') {
-          // Android 调用
-          const message = JSON.stringify({
-            plugin,
-            method,
-            params
-          })
-          const result = ((window as any).aitutorCallback as any)?.postMessage?.(message)
-          // 假设原生返回Promise或立即resolve
-          resolve(result)
-        } else {
-          // 没有找到原生接口，返回默认值
-          resolve(null)
-        }
-      } catch (error) {
-        reject(error)
-      }
-    })
+    // 检查原生Bridge是否可用
+    if (typeof window !== 'undefined' && window.GiggleBridge?.callNative) {
+      return window.GiggleBridge.callNative(plugin, method, params)
+    }
+    
+    // Fallback: 如果没有原生桥接，返回默认值或模拟数据
+    console.warn('Native bridge not available, using fallback')
+    return Promise.resolve(null)
   }
 
   // Navigation methods using Router plugin
@@ -237,13 +215,8 @@ class Bridge {
   }
 }
 
-// 创建全局Bridge实例
+// 创建Bridge实例
 const bridge = new Bridge()
-
-// 设置全局访问
-if (typeof window !== 'undefined') {
-  window.GiggleBridge = bridge
-}
 
 // Export interfaces and classes
 export { PlatformInfo, Bridge, RouterPlugin, PreferencePlugin }
