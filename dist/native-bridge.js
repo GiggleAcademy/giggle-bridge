@@ -55,13 +55,6 @@ function initializeNativeBridge() {
             return null;
         }
     };
-    if (window.webkit?.messageHandlers?.giggleCallback) {
-        window.webkit.messageHandlers.giggleCallback.addMessageListener(function (message) {
-            if (message.callbackId && message.response) {
-                window.GiggleBridge.handleCallback(message.callbackId, message.response);
-            }
-        });
-    }
     window.handleGiggleCallback = function (message) {
         try {
             const parsedMessage = JSON.parse(message);

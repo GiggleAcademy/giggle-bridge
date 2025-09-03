@@ -10,14 +10,22 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "clean": "rm -rf dist",
     "build": "npm run clean && tsc",
+    "prepare": "husky",
     "prepublishOnly": "npm run build"
   },
   "author": "",
   "license": "ISC",
   "description": "Modern JavaScript Bridge for Web-Native communication",
-  "keywords": ["bridge", "native", "webview", "ios", "android"],
+  "keywords": [
+    "bridge",
+    "native",
+    "webview",
+    "ios",
+    "android"
+  ],
   "devDependencies": {
     "@types/node": "^24.3.0",
+    "husky": "^9.1.7",
     "typescript": "^5.0.0"
   }
 }

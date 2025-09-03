@@ -89,18 +89,11 @@ export function initializeNativeBridge(): void {
       }
       return null
     }
-  }
+  };
   
   // 设置回调监听器
   
-  // iOS WebKit 回调监听
-  if (window.webkit?.messageHandlers?.giggleCallback) {
-    window.webkit.messageHandlers.giggleCallback.addMessageListener(function(message: any) {
-      if (message.callbackId && message.response) {
-        window.GiggleBridge.handleCallback(message.callbackId, message.response)
-      }
-    })
-  }
+
   
   // Android 回调监听 - 设置全局回调处理函数
   (window as any).handleGiggleCallback = function(message: string) {

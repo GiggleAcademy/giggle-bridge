@@ -1,0 +1,7 @@
+echo "🔨 Building project before commit..."
+npm run build
+
+echo "📦 Adding dist files to commit..."
+git add -f dist/
+
+echo "✅ Pre-commit hook completed!"
