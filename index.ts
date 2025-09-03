@@ -29,9 +29,6 @@ interface RouterPlugin {
 
 interface PreferencePlugin {
   readValues(keys?: string[]): Promise<PlatformInfo>
-  getPointsDescDoneBtn(): string
-  updatePlatformInfo(newInfo: Partial<PlatformInfo>): void
-  getPlatformInfo(): PlatformInfo
 }
 
 // Plugin implementations
@@ -77,17 +74,6 @@ class PreferencePluginImpl implements PreferencePlugin {
     }
   }
 
-  public getPointsDescDoneBtn(): string {
-    return this.platformInfo.pointsDescDoneBtn
-  }
-
-  public updatePlatformInfo(newInfo: Partial<PlatformInfo>): void {
-    this.platformInfo = { ...this.platformInfo, ...newInfo }
-  }
-
-  public getPlatformInfo(): PlatformInfo {
-    return { ...this.platformInfo }
-  }
 }
 
 // Global window interface
@@ -204,8 +190,7 @@ class Bridge {
     return this.platformInfo
   }
 
-  // Platform info methods using Preference plugin
-  public async requestPlatformInfo(): Promise<PlatformInfo> {
+  public async requestPlatformInfoAsync(): Promise<PlatformInfo> {
     // 如果已经初始化过，直接返回已有数据
     if (this.isPlatformInited) {
       console.log('🚀 Platform info already initialized, returning cached data')
@@ -223,6 +208,11 @@ class Bridge {
   }
 
 
+  public requestPlatformInfo(success: (info: PlatformInfo) => void, fail?: (error: any) => void): void {
+    this.requestPlatformInfoAsync().then(success).catch(fail)
+  }
+
+
   // 强制重新初始化平台信息（忽略缓存）
   public async forceRefreshPlatformInfo(): Promise<PlatformInfo> {
     console.log('🔄 Force refreshing platform info...')
@@ -235,6 +225,10 @@ class Bridge {
       console.error('❌ Failed to force refresh platform info:', error)
       throw error
     }
+  }
+
+  public get pointsDescDoneBtn(): string {
+    return this.platformInfo.pointsDescDoneBtn
   }
 
   // Navigation control
