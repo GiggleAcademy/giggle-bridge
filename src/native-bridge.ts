@@ -48,6 +48,8 @@ export function initializeNativeBridge(): void {
           params: params || {},
           callbackId: callbackId
         }
+        console.log('GiggleBridge.callNative', message )
+        console.log('window.webkit?.messageHandlers?.giggleBridge',window.webkit?.messageHandlers?.giggleBridge)
         
         // iOS WebKit 调用
         if (window.webkit?.messageHandlers?.giggleBridge) {

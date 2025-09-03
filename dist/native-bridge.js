@@ -17,6 +17,8 @@ function initializeNativeBridge() {
                     params: params || {},
                     callbackId: callbackId
                 };
+                console.log('GiggleBridge.callNative', message);
+                console.log('window.webkit?.messageHandlers?.giggleBridge', window.webkit?.messageHandlers?.giggleBridge);
                 if (window.webkit?.messageHandlers?.giggleBridge) {
                     window.webkit.messageHandlers.giggleBridge.postMessage(message);
                 }
