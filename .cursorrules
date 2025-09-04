@@ -1,0 +1,132 @@
+# Giggle Bridge Project Rules
+
+## Project Overview
+This is a TypeScript-based JavaScript Bridge library for Web-Native communication between web applications and mobile apps (iOS/Android). The project follows a modular plugin architecture with clean separation of concerns.
+
+## Architecture
+```
+src/
+├── index.ts              # Main Bridge class with business logic
+├── native-bridge.ts      # Native communication layer (iOS WebKit + Android)
+├── router-plugin.ts      # Navigation and routing functionality
+└── preference-plugin.ts  # Platform preferences and data reading
+```
+
+## Code Style and Conventions
+
+### TypeScript Standards
+- Use strict TypeScript configuration
+- Prefer `interface` over `type` for object shapes
+- Use explicit return types for public methods
+- Prefer `async/await` over Promises chains
+- Use optional chaining (`?.`) for safe property access
+- Use nullish coalescing (`??`) over logical OR (`||`) when appropriate
+
+### Naming Conventions
+- Classes: PascalCase (e.g., `RouterPluginImpl`, `Bridge`)
+- Interfaces: PascalCase with descriptive names (e.g., `RouterPlugin`, `PlatformInfo`)
+- Methods: camelCase with descriptive verbs (e.g., `requestPlatformInfo`, `dismissLoading`)
+- Constants: UPPER_SNAKE_CASE (e.g., `IS_TEST`, `IS_DEV`)
+- Private methods: prefix with underscore (e.g., `_fetchPlatformInfo`)
+
+### Plugin Development Rules
+1. **Separation of Concerns**: Each plugin should handle only its specific domain
+2. **State Management**: Plugins should NOT maintain application state - only Bridge class manages state
+3. **Error Handling**: Plugins should throw errors, let Bridge layer handle them
+4. **Parameter Format**: Always pass parameters as objects: `{ key: value }` instead of raw values
+5. **Interface First**: Define interface before implementation
+
+### Native Call Standards
+- All native calls must use object parameters: `callNative('Plugin', 'method', { param })`
+- Plugin names are capitalized: 'Router', 'Preference'
+- Method names use camelCase
+- Always return Promises from plugin methods
+
+### File Organization
+- Keep plugins in separate files: `{plugin-name}-plugin.ts`
+- Export both interface and implementation from plugin files
+- Main index.ts should only import and compose plugins
+- Native bridge logic stays isolated in `native-bridge.ts`
+
+## Environment and Build
+- Use ES2020 target with DOM lib
+- Output to `dist/` directory with declaration files
+- Git hooks automatically compile before commits
+- Support both test/dev/prod environments with different defaults
+
+## Native Communication Protocol
+```typescript
+// iOS WebKit
+window.webkit.messageHandlers.giggleBridge.postMessage({
+  plugin: 'Router',
+  method: 'route', 
+  params: { url: 'giggleacademy://unity/playGame' },
+  callbackId: 'cb_123456'
+})
+
+// Android WebView
+window.giggleBridge.postMessage(JSON.stringify({
+  plugin: 'Router',
+  method: 'route',
+  params: { url: 'giggleacademy://unity/playGame' },
+  callbackId: 'cb_123456'
+}))
+```
+
+## Testing and Quality
+- Prefer explicit error handling over silent failures
+- Log important operations with emojis for clarity (🚀, 📱, ✅, ❌)
+- Test both iOS and Android compatibility
+- Maintain backward compatibility with legacy interfaces
+
+## Bridge API Design Principles
+1. **Promise-first**: All async operations return Promises
+2. **Callback Support**: Provide callback versions for legacy compatibility
+3. **Caching**: Smart caching with `isPlatformInited` flag
+4. **Force Refresh**: Always provide force refresh options
+5. **Graceful Fallbacks**: Default values when native calls fail
+
+## Don't Do
+- ❌ Don't commit or push code automatically
+- ❌ Don't modify git hooks without explicit request
+- ❌ Don't change the plugin separation architecture
+- ❌ Don't add state management to plugin classes
+- ❌ Don't use direct parameter passing (use object wrapping)
+- ❌ Don't break the Promise chain pattern
+
+## Do
+- ✅ Maintain clean plugin separation
+- ✅ Use TypeScript strict mode
+- ✅ Follow the established parameter object pattern
+- ✅ Keep backward compatibility
+- ✅ Document complex native communication flows
+- ✅ Test both platforms (iOS WebKit + Android WebView)
+- ✅ Use meaningful console logs with emojis
+
+## Example Plugin Structure
+```typescript
+// plugin-name-plugin.ts
+export interface PluginNamePlugin {
+  methodName(param: string): Promise<ReturnType>
+}
+
+export class PluginNamePluginImpl implements PluginNamePlugin {
+  private callNative: CallNativeFn
+
+  constructor(callNative: CallNativeFn) {
+    this.callNative = callNative
+  }
+
+  public async methodName(param: string): Promise<ReturnType> {
+    try {
+      const result = await this.callNative('PluginName', 'methodName', { param })
+      return result
+    } catch (error) {
+      console.error('Failed to call method:', error)
+      throw error // Let Bridge handle errors
+    }
+  }
+}
+```
+
+This project prioritizes maintainability, cross-platform compatibility, and clean architecture over quick fixes.

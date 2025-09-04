@@ -10,13 +10,8 @@
 
 ```bash
 # 使用 pnpm (推荐)
-pnpm install @giggle-academy/bridge
+pnpm add github:GiggleAcademy/giggle-bridge
 
-# 或使用 npm
-npm install @giggle-academy/bridge
-
-# 或使用 yarn
-yarn add @giggle-academy/bridge
 ```
 
 
