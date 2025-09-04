@@ -1,6 +1,11 @@
 // 原生Bridge接口定义
 interface NativeBridge {
-  callbacks: { [key: string]: { resolve: (value: any) => void; reject: (reason?: any) => void } }
+  callbacks: {
+    [key: string]: {
+      resolve: (value: any) => void
+      reject: (reason?: any) => void
+    }
+  }
   callbackId: number
   callNative(plugin: string, method: string, params?: any): Promise<any>
   handleCallback(callbackId: string, response: any): void
@@ -35,30 +40,41 @@ export function initializeNativeBridge(): void {
   window.GiggleBridge = {
     callbacks: {},
     callbackId: 0,
-    
-    callNative: function(plugin: string, method: string, params?: any): Promise<any> {
+
+    callNative: function (
+      plugin: string,
+      method: string,
+      params?: any
+    ): Promise<any> {
       return new Promise((resolve, reject) => {
-        const callbackId = 'cb_' + Date.now() + '_' + Math.random().toString(36).substr(2, 5)
-        
+        const callbackId =
+          'cb_' + Date.now() + '_' + Math.random().toString(36).substr(2, 5)
+
         this.callbacks[callbackId] = { resolve, reject }
-        
+
         const message = {
           plugin: plugin,
           method: method,
           params: params || {},
-          callbackId: callbackId
+          callbackId: callbackId,
         }
-        console.log('GiggleBridge.callNative', message )
-        console.log('window.webkit?.messageHandlers?.giggleBridge',window.webkit?.messageHandlers?.giggleBridge)
-        
+        console.log('GiggleBridge.callNative', message)
+        console.log(
+          'window.webkit?.messageHandlers?.giggleBridge',
+          window.webkit?.messageHandlers?.giggleBridge
+        )
+
         // iOS WebKit 调用
         if (window.webkit?.messageHandlers?.giggleBridge) {
           window.webkit.messageHandlers.giggleBridge.postMessage(message)
-        } 
+        }
         // Android 调用 - 假设Android也有类似的giggleBridge接口
-        else if ((window as any).giggleBridge && (window as any).giggleBridge.postMessage) {
+        else if (
+          (window as any).giggleBridge &&
+          (window as any).giggleBridge.postMessage
+        ) {
           try {
-            (window as any).giggleBridge.postMessage(JSON.stringify(message))
+            ;(window as any).giggleBridge.postMessage(JSON.stringify(message))
           } catch (error) {
             console.error('处理 Android 消息时出错:', error)
             reject(error)
@@ -72,8 +88,8 @@ export function initializeNativeBridge(): void {
         }
       })
     },
-    
-    handleCallback: function(callbackId: string, response: any): void {
+
+    handleCallback: function (callbackId: string, response: any): void {
       const callback = this.callbacks[callbackId]
       if (callback) {
         if (response.error) {
@@ -84,33 +100,32 @@ export function initializeNativeBridge(): void {
         delete this.callbacks[callbackId]
       }
     },
-    
-    receiveNativeCall: function(method: string, data: any): any {
+
+    receiveNativeCall: function (method: string, data: any): any {
       if (window.__nativeCallBack && window.__nativeCallBack[method]) {
         return window.__nativeCallBack[method](data)
       }
       return null
-    }
-  };
-  
-  // 设置回调监听器
-  
+    },
+  }
 
-  
+  // 设置回调监听器
+
   // Android 回调监听 - 设置全局回调处理函数
-  (window as any).handleGiggleCallback = function(message: string) {
+  ;(window as any).handleGiggleCallback = function (message: string) {
     try {
       const parsedMessage = JSON.parse(message)
       if (parsedMessage.callbackId && parsedMessage.response) {
-        window.GiggleBridge.handleCallback(parsedMessage.callbackId, parsedMessage.response)
+        window.GiggleBridge.handleCallback(
+          parsedMessage.callbackId,
+          parsedMessage.response
+        )
       }
     } catch (error) {
       console.error('处理 Android 回调时出错:', error)
     }
   }
 }
-
-
 
 // 自动初始化
 if (typeof window !== 'undefined') {

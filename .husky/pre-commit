@@ -1,3 +1,9 @@
+echo "💅 Checking code format with Prettier..."
+npm run format:check
+
+echo "🔍 Running ESLint before commit..."
+npm run lint
+
 echo "🔨 Building project before commit..."
 npm run build
 

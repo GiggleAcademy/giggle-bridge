@@ -1,5 +1,9 @@
 // Native call function type
-type CallNativeFn = (plugin: string, method: string, params?: any) => Promise<any>
+type CallNativeFn = (
+  plugin: string,
+  method: string,
+  params?: any
+) => Promise<any>
 
 // Router plugin interface
 export interface RouterPlugin {

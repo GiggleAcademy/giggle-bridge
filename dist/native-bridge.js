@@ -15,15 +15,17 @@ function initializeNativeBridge() {
                     plugin: plugin,
                     method: method,
                     params: params || {},
-                    callbackId: callbackId
+                    callbackId: callbackId,
                 };
                 console.log('GiggleBridge.callNative', message);
                 console.log('window.webkit?.messageHandlers?.giggleBridge', window.webkit?.messageHandlers?.giggleBridge);
                 if (window.webkit?.messageHandlers?.giggleBridge) {
                     window.webkit.messageHandlers.giggleBridge.postMessage(message);
                 }
-                else if (window.giggleBridge && window.giggleBridge.postMessage) {
+                else if (window.giggleBridge &&
+                    window.giggleBridge.postMessage) {
                     try {
+                        ;
                         window.giggleBridge.postMessage(JSON.stringify(message));
                     }
                     catch (error) {
@@ -55,7 +57,7 @@ function initializeNativeBridge() {
                 return window.__nativeCallBack[method](data);
             }
             return null;
-        }
+        },
     };
     window.handleGiggleCallback = function (message) {
         try {

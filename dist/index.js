@@ -23,7 +23,7 @@ class Bridge {
             language: 'en',
             pointsDescDoneBtn: '0,0,0,0',
             appVersion: IS_DEV ? '999.0.0' : '1.16.0',
-            greyScaleMode: ''
+            greyScaleMode: '',
         };
         this.isPlatformInited = false;
         this.router = new router_plugin_1.RouterPluginImpl(this.callNative.bind(this));

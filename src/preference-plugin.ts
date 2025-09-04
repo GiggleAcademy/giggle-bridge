@@ -15,7 +15,11 @@ export interface PlatformInfo {
 }
 
 // Native call function type
-type CallNativeFn = (plugin: string, method: string, params?: any) => Promise<any>
+type CallNativeFn = (
+  plugin: string,
+  method: string,
+  params?: any
+) => Promise<any>
 
 // Preference plugin interface
 export interface PreferencePlugin {

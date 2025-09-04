@@ -1,16 +1,18 @@
 import './native-bridge'
 import { RouterPlugin, RouterPluginImpl } from './router-plugin'
-import { PreferencePlugin, PreferencePluginImpl, PlatformInfo } from './preference-plugin'
+import {
+  PreferencePlugin,
+  PreferencePluginImpl,
+  PlatformInfo,
+} from './preference-plugin'
 
 const IS_TEST = process.env.NODE_ENV === 'test'
 const IS_DEV = process.env.NODE_ENV === 'development'
 
-
-
 // Global window interface - Bridge实例（业务层）
 declare global {
   interface Window {
-    GiggleBridgeAPI?: Bridge  // 重命名避免类型冲突
+    GiggleBridgeAPI?: Bridge // 重命名避免类型冲突
   }
 }
 
@@ -28,13 +30,13 @@ class Bridge {
     token: IS_TEST
       ? 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0aW1lU3RhbXAiOjE3NDc4OTcyNDk0ODEsInVzZXJJZCI6NjI0MTAwMDI3ODI2MjQ1LCJlbWFpbCI6IjE1OTc4ODc2MjBAcXEuY29tIiwidXNlcm5hbWUiOiJkYXJyZW4ifQ.FDgTG2t5pvrhdbmqS3MItA2-eyk3YUYB0DDYdrI4X4U'
       : IS_DEV
-      ? 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0aW1lU3RhbXAiOjE3NTM3NTY0MzMwNTUsInVzZXJJZCI6NjY5MzQ3MTc1NDU2ODM3LCJlbWFpbCI6Imp1bi5sQGdpZ2dsZWFjYWRlbXkubWUiLCJ1c2VybmFtZSI6ImwganVuIn0.Fyal_HiQu5HB3T2py3svD_4i_NTd8uY6wZ0Npg5tnRc'
-      : '',
+        ? 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0aW1lU3RhbXAiOjE3NTM3NTY0MzMwNTUsInVzZXJJZCI6NjY5MzQ3MTc1NDU2ODM3LCJlbWFpbCI6Imp1bi5sQGdpZ2dsZWFjYWRlbXkubWUiLCJ1c2VybmFtZSI6ImwganVuIn0.Fyal_HiQu5HB3T2py3svD_4i_NTd8uY6wZ0Npg5tnRc'
+        : '',
     storyQuiz: '',
     language: 'en',
     pointsDescDoneBtn: '0,0,0,0',
     appVersion: IS_DEV ? '999.0.0' : '1.16.0',
-    greyScaleMode: ''
+    greyScaleMode: '',
   }
 
   // Platform initialization status
@@ -52,14 +54,18 @@ class Bridge {
    * @param method 方法名称
    * @param params 参数
    */
-  public callNative(plugin: string, method: string, params?: any): Promise<any> {
+  public callNative(
+    plugin: string,
+    method: string,
+    params?: any
+  ): Promise<any> {
     console.log(`🚀 GiggleBridge.callNative: ${plugin}.${method}`, params)
-    
+
     // 检查原生Bridge是否可用
     if (typeof window !== 'undefined' && window.GiggleBridge?.callNative) {
       return window.GiggleBridge.callNative(plugin, method, params)
     }
-    
+
     // Fallback: 如果没有原生桥接，返回默认值或模拟数据
     console.warn('Native bridge not available, using fallback')
     return Promise.resolve(null)
@@ -95,7 +101,7 @@ class Bridge {
   // Private method to fetch platform info from native
   private async _fetchPlatformInfo(): Promise<PlatformInfo> {
     // 获取PlatformInfo的所有key作为参数 - 业务逻辑在Bridge层处理
-    
+
     const info = await this.preference.readValues()
     // Update bridge's platform info - 只更新从原生获取的有效数据
     this.platformInfo = { ...this.platformInfo, ...info }
@@ -109,7 +115,7 @@ class Bridge {
       console.log('🚀 Platform info already initialized, returning cached data')
       return this.platformInfo
     }
-    
+
     try {
       await this._fetchPlatformInfo()
       console.log('✅ Platform info initialized successfully')
@@ -120,16 +126,17 @@ class Bridge {
     }
   }
 
-
-  public requestPlatformInfo(success: (info: PlatformInfo) => void, fail?: (error: any) => void): void {
+  public requestPlatformInfo(
+    success: (info: PlatformInfo) => void,
+    fail?: (error: any) => void
+  ): void {
     this.requestPlatformInfoAsync().then(success).catch(fail)
   }
-
 
   // 强制重新初始化平台信息（忽略缓存）
   public async forceRefreshPlatformInfo(): Promise<PlatformInfo> {
     console.log('🔄 Force refreshing platform info...')
-    
+
     try {
       await this._fetchPlatformInfo()
       console.log('✅ Platform info force refreshed successfully')
@@ -143,8 +150,6 @@ class Bridge {
   public get pointsDescDoneBtn(): string {
     return this.platformInfo.pointsDescDoneBtn
   }
-
-
 }
 
 // 创建Bridge实例
