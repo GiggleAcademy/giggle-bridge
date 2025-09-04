@@ -2,37 +2,10 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Bridge = void 0;
 require("./native-bridge");
+const router_plugin_1 = require("./router-plugin");
+const preference_plugin_1 = require("./preference-plugin");
 const IS_TEST = process.env.NODE_ENV === 'test';
 const IS_DEV = process.env.NODE_ENV === 'development';
-class RouterPluginImpl {
-    constructor(callNative) {
-        this.callNative = callNative;
-    }
-    async route(url) {
-        await this.callNative('Router', 'route', { url });
-    }
-    async dismiss() {
-        await this.callNative('Router', 'dismiss', {});
-    }
-    async dismissLoading() {
-        await this.callNative('Router', 'dismissLoading', {});
-    }
-}
-class PreferencePluginImpl {
-    constructor(callNative) {
-        this.callNative = callNative;
-    }
-    async readValues(keys) {
-        try {
-            const data = await this.callNative('Preference', 'readValues', { keys });
-            return data || {};
-        }
-        catch (error) {
-            console.error('Failed to read platform values:', error);
-            throw error;
-        }
-    }
-}
 class Bridge {
     constructor() {
         this.platformInfo = {
@@ -53,8 +26,8 @@ class Bridge {
             greyScaleMode: ''
         };
         this.isPlatformInited = false;
-        this.router = new RouterPluginImpl(this.callNative.bind(this));
-        this.preference = new PreferencePluginImpl(this.callNative.bind(this));
+        this.router = new router_plugin_1.RouterPluginImpl(this.callNative.bind(this));
+        this.preference = new preference_plugin_1.PreferencePluginImpl(this.callNative.bind(this));
     }
     callNative(plugin, method, params) {
         console.log(`🚀 GiggleBridge.callNative: ${plugin}.${method}`, params);

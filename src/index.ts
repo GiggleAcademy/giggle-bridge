@@ -1,77 +1,11 @@
 import './native-bridge'
+import { RouterPlugin, RouterPluginImpl } from './router-plugin'
+import { PreferencePlugin, PreferencePluginImpl, PlatformInfo } from './preference-plugin'
 
 const IS_TEST = process.env.NODE_ENV === 'test'
 const IS_DEV = process.env.NODE_ENV === 'development'
 
-// Platform info interface
-interface PlatformInfo {
-  platform: string
-  version?: string
-  userId: string
-  kidId: string
-  kidName: string
-  appBaseUrl: string
-  token: string
-  storyQuiz: string
-  language: string
-  pointsDescDoneBtn: string
-  appVersion: string
-  greyScaleMode: string
-}
 
-// Native call function type
-type CallNativeFn = (plugin: string, method: string, params?: any) => Promise<any>
-
-// Plugin interfaces
-interface RouterPlugin {
-  route(url: string): Promise<void>
-  dismiss(): Promise<void>
-  dismissLoading(): Promise<void>
-}
-
-interface PreferencePlugin {
-  readValues(keys?: string[]): Promise<PlatformInfo>
-}
-
-// Plugin implementations
-class RouterPluginImpl implements RouterPlugin {
-  private callNative: CallNativeFn
-
-  constructor(callNative: CallNativeFn) {
-    this.callNative = callNative
-  }
-
-  public async route(url: string): Promise<void> {
-    await this.callNative('Router', 'route', { url })
-  }
-
-  public async dismiss(): Promise<void> {
-    await this.callNative('Router', 'dismiss', {})
-  }
-
-  public async dismissLoading(): Promise<void> {
-    await this.callNative('Router', 'dismissLoading', {})
-  }
-}
-
-class PreferencePluginImpl implements PreferencePlugin {
-  private callNative: CallNativeFn
-
-  constructor(callNative: CallNativeFn) {
-    this.callNative = callNative
-  }
-
-  public async readValues(keys?: string[]): Promise<PlatformInfo> {
-    try {
-      const data = await this.callNative('Preference', 'readValues', { keys })
-      return data || {}
-    } catch (error) {
-      console.error('Failed to read platform values:', error)
-      throw error // 让Bridge层处理错误
-    }
-  }
-
-}
 
 // Global window interface - Bridge实例（业务层）
 declare global {
@@ -217,7 +151,9 @@ class Bridge {
 const bridge = new Bridge()
 
 // Export interfaces and classes
-export { PlatformInfo, Bridge, RouterPlugin, PreferencePlugin }
+export { RouterPlugin } from './router-plugin'
+export { PreferencePlugin, PlatformInfo } from './preference-plugin'
+export { Bridge }
 
 // Export the bridge instance as default
 export default bridge

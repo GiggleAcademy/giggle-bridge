@@ -1,26 +1,5 @@
 import './native-bridge';
-interface PlatformInfo {
-    platform: string;
-    version?: string;
-    userId: string;
-    kidId: string;
-    kidName: string;
-    appBaseUrl: string;
-    token: string;
-    storyQuiz: string;
-    language: string;
-    pointsDescDoneBtn: string;
-    appVersion: string;
-    greyScaleMode: string;
-}
-interface RouterPlugin {
-    route(url: string): Promise<void>;
-    dismiss(): Promise<void>;
-    dismissLoading(): Promise<void>;
-}
-interface PreferencePlugin {
-    readValues(keys?: string[]): Promise<PlatformInfo>;
-}
+import { PlatformInfo } from './preference-plugin';
 declare global {
     interface Window {
         GiggleBridgeAPI?: Bridge;
@@ -46,5 +25,7 @@ declare class Bridge {
     get pointsDescDoneBtn(): string;
 }
 declare const bridge: Bridge;
-export { PlatformInfo, Bridge, RouterPlugin, PreferencePlugin };
+export { RouterPlugin } from './router-plugin';
+export { PreferencePlugin, PlatformInfo } from './preference-plugin';
+export { Bridge };
 export default bridge;
