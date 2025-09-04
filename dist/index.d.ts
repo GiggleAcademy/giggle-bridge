@@ -38,12 +38,12 @@ declare class Bridge {
     finishChallenge(): Promise<void>;
     flashcardLearning(): Promise<void>;
     dismissLoading(): Promise<void>;
+    dismiss(): Promise<void>;
     private _fetchPlatformInfo;
     requestPlatformInfoAsync(): Promise<PlatformInfo>;
     requestPlatformInfo(success: (info: PlatformInfo) => void, fail?: (error: any) => void): void;
     forceRefreshPlatformInfo(): Promise<PlatformInfo>;
     get pointsDescDoneBtn(): string;
-    dismiss(): Promise<void>;
 }
 declare const bridge: Bridge;
 export { PlatformInfo, Bridge, RouterPlugin, PreferencePlugin };

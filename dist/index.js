@@ -79,6 +79,9 @@ class Bridge {
     async dismissLoading() {
         await this.router.dismissLoading();
     }
+    async dismiss() {
+        await this.router.dismiss();
+    }
     async _fetchPlatformInfo() {
         const info = await this.preference.readValues();
         this.platformInfo = { ...this.platformInfo, ...info };
@@ -117,9 +120,6 @@ class Bridge {
     }
     get pointsDescDoneBtn() {
         return this.platformInfo.pointsDescDoneBtn;
-    }
-    async dismiss() {
-        await this.router.dismiss();
     }
 }
 exports.Bridge = Bridge;

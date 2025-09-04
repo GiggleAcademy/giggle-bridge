@@ -153,6 +153,11 @@ class Bridge {
     await this.router.dismissLoading()
   }
 
+  // Navigation control
+  public async dismiss(): Promise<void> {
+    await this.router.dismiss()
+  }
+
   // Private method to fetch platform info from native
   private async _fetchPlatformInfo(): Promise<PlatformInfo> {
     // 获取PlatformInfo的所有key作为参数 - 业务逻辑在Bridge层处理
@@ -205,10 +210,7 @@ class Bridge {
     return this.platformInfo.pointsDescDoneBtn
   }
 
-  // Navigation control
-  public async dismiss(): Promise<void> {
-    await this.router.dismiss()
-  }
+
 }
 
 // 创建Bridge实例

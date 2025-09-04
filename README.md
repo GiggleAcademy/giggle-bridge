@@ -29,8 +29,7 @@ yarn add @giggle-academy/bridge
 // 导入 Bridge
 import bridge from '@giggle-academy/bridge'
 
-// 或者使用全局访问
-console.log(window.GiggleBridge)
+
 ```
 
 ### 平台信息获取
@@ -38,7 +37,7 @@ console.log(window.GiggleBridge)
 ```typescript
 // Promise 方式 (推荐)
 try {
-  const platformInfo = await window.GiggleBridge.requestPlatformInfoAsync()
+  const platformInfo = await bridge.requestPlatformInfoAsync()
   console.log('用户ID:', platformInfo.userId)
   console.log('应用版本:', platformInfo.appVersion)
 } catch (error) {
@@ -46,7 +45,7 @@ try {
 }
 
 // 回调方式
-window.GiggleBridge.requestPlatformInfo(
+bridge.requestPlatformInfo(
   (info) => {
     console.log('平台信息:', info)
   },
@@ -60,14 +59,14 @@ window.GiggleBridge.requestPlatformInfo(
 
 ```typescript
 // 游戏功能
-await window.GiggleBridge.playGame()
-await window.GiggleBridge.inviteFriends()
-await window.GiggleBridge.finishChallenge()
-await window.GiggleBridge.flashcardLearning()
+await bridge.playGame()
+await bridge.inviteFriends()
+await bridge.finishChallenge()
+await bridge.flashcardLearning()
 
 // 页面控制
-await window.GiggleBridge.dismiss({ reason: 'user_cancel' })
-await window.GiggleBridge.dismissLoading()
+await bridge.dismiss({ reason: 'user_cancel' })
+await bridge.dismissLoading()
 ```
 
 ## 📚 API 文档
