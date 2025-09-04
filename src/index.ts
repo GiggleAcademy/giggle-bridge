@@ -46,7 +46,7 @@ class RouterPluginImpl implements RouterPlugin {
   }
 
   public async dismiss(): Promise<void> {
-    await this.callNative('Router', 'dismiss', {  })
+    await this.callNative('Router', 'dismiss', {})
   }
 
   public async dismissLoading(): Promise<void> {
@@ -56,23 +56,18 @@ class RouterPluginImpl implements RouterPlugin {
 
 class PreferencePluginImpl implements PreferencePlugin {
   private callNative: CallNativeFn
-  private platformInfo: PlatformInfo
 
-  constructor(callNative: CallNativeFn, defaultPlatformInfo: PlatformInfo) {
+  constructor(callNative: CallNativeFn) {
     this.callNative = callNative
-    this.platformInfo = { ...defaultPlatformInfo }
   }
 
   public async readValues(keys?: string[]): Promise<PlatformInfo> {
     try {
       const data = await this.callNative('Preference', 'readValues', { keys })
-      if (data) {
-        this.platformInfo = { ...this.platformInfo, ...data }
-      }
-      return this.platformInfo
+      return data || {}
     } catch (error) {
       console.error('Failed to read platform values:', error)
-      return this.platformInfo // 返回当前值作为fallback
+      throw error // 让Bridge层处理错误
     }
   }
 
@@ -112,9 +107,9 @@ class Bridge {
   public isPlatformInited: boolean = false
 
   constructor() {
-    // 初始化插件，传入callNative方法和默认平台信息
+    // 初始化插件，传入callNative方法
     this.router = new RouterPluginImpl(this.callNative.bind(this))
-    this.preference = new PreferencePluginImpl(this.callNative.bind(this), this.platformInfo)
+    this.preference = new PreferencePluginImpl(this.callNative.bind(this))
   }
 
   /**
@@ -160,9 +155,10 @@ class Bridge {
 
   // Private method to fetch platform info from native
   private async _fetchPlatformInfo(): Promise<PlatformInfo> {
+    // 获取PlatformInfo的所有key作为参数 - 业务逻辑在Bridge层处理
     
     const info = await this.preference.readValues()
-    // Update bridge's platform info
+    // Update bridge's platform info - 只更新从原生获取的有效数据
     this.platformInfo = { ...this.platformInfo, ...info }
     this.isPlatformInited = true
     return this.platformInfo

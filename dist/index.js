@@ -19,21 +19,17 @@ class RouterPluginImpl {
     }
 }
 class PreferencePluginImpl {
-    constructor(callNative, defaultPlatformInfo) {
+    constructor(callNative) {
         this.callNative = callNative;
-        this.platformInfo = { ...defaultPlatformInfo };
     }
     async readValues(keys) {
         try {
             const data = await this.callNative('Preference', 'readValues', { keys });
-            if (data) {
-                this.platformInfo = { ...this.platformInfo, ...data };
-            }
-            return this.platformInfo;
+            return data || {};
         }
         catch (error) {
             console.error('Failed to read platform values:', error);
-            return this.platformInfo;
+            throw error;
         }
     }
 }
@@ -58,7 +54,7 @@ class Bridge {
         };
         this.isPlatformInited = false;
         this.router = new RouterPluginImpl(this.callNative.bind(this));
-        this.preference = new PreferencePluginImpl(this.callNative.bind(this), this.platformInfo);
+        this.preference = new PreferencePluginImpl(this.callNative.bind(this));
     }
     callNative(plugin, method, params) {
         console.log(`🚀 GiggleBridge.callNative: ${plugin}.${method}`, params);
