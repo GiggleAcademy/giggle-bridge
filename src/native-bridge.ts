@@ -89,13 +89,23 @@ export function initializeNativeBridge(): void {
       })
     },
 
-    handleCallback: function (callbackId: string, response: any): void {
+    handleCallback: function (callbackId: string, response: string): void {
       const callback = this.callbacks[callbackId]
       if (callback) {
-        if (response.error) {
-          callback.reject(response.error)
-        } else {
-          callback.resolve(response.data)
+        try {
+          const responseData = JSON.parse(response)
+          if (responseData.error) {
+            callback.reject(responseData.error)
+          } else {
+            callback.resolve(responseData.data)
+          }
+        } catch (error) {
+          console.error(
+            '❌handleCallback:Failed to parse JSON response:',
+            error,
+            response
+          )
+          callback.reject(error)
         }
         delete this.callbacks[callbackId]
       }
@@ -110,21 +120,6 @@ export function initializeNativeBridge(): void {
   }
 
   // 设置回调监听器
-
-  // Android 回调监听 - 设置全局回调处理函数
-  ;(window as any).handleGiggleCallback = function (message: string) {
-    try {
-      const parsedMessage = JSON.parse(message)
-      if (parsedMessage.callbackId && parsedMessage.response) {
-        window.GiggleBridge.handleCallback(
-          parsedMessage.callbackId,
-          parsedMessage.response
-        )
-      }
-    } catch (error) {
-      console.error('处理 Android 回调时出错:', error)
-    }
-  }
 }
 
 // 自动初始化

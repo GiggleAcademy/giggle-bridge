@@ -43,11 +43,18 @@ function initializeNativeBridge() {
         handleCallback: function (callbackId, response) {
             const callback = this.callbacks[callbackId];
             if (callback) {
-                if (response.error) {
-                    callback.reject(response.error);
+                try {
+                    const responseData = JSON.parse(response);
+                    if (responseData.error) {
+                        callback.reject(responseData.error);
+                    }
+                    else {
+                        callback.resolve(responseData.data);
+                    }
                 }
-                else {
-                    callback.resolve(response.data);
+                catch (error) {
+                    console.error('❌handleCallback:Failed to parse JSON response:', error, response);
+                    callback.reject(error);
                 }
                 delete this.callbacks[callbackId];
             }
@@ -58,17 +65,6 @@ function initializeNativeBridge() {
             }
             return null;
         },
-    };
-    window.handleGiggleCallback = function (message) {
-        try {
-            const parsedMessage = JSON.parse(message);
-            if (parsedMessage.callbackId && parsedMessage.response) {
-                window.GiggleBridge.handleCallback(parsedMessage.callbackId, parsedMessage.response);
-            }
-        }
-        catch (error) {
-            console.error('处理 Android 回调时出错:', error);
-        }
     };
 }
 if (typeof window !== 'undefined') {

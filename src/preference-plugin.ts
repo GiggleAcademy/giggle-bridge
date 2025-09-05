@@ -23,7 +23,7 @@ type CallNativeFn = (
 
 // Preference plugin interface
 export interface PreferencePlugin {
-  readValues(keys?: string[]): Promise<PlatformInfo>
+  readValues(keys?: string[]): Promise<Partial<PlatformInfo>>
 }
 
 // Preference plugin implementation
@@ -34,10 +34,21 @@ export class PreferencePluginImpl implements PreferencePlugin {
     this.callNative = callNative
   }
 
-  public async readValues(keys?: string[]): Promise<PlatformInfo> {
+  public async readValues(keys?: string[]): Promise<Partial<PlatformInfo>> {
     try {
       const data = await this.callNative('Preference', 'readValues', { keys })
-      return data || {}
+
+      // 处理原生返回的可能是JSON字符串的情况
+      if (typeof data === 'string') {
+        try {
+          return JSON.parse(data) || {}
+        } catch (parseError) {
+          console.error('Failed to parse JSON response:', parseError, data)
+          return {}
+        }
+      }
+
+      return data
     } catch (error) {
       console.error('Failed to read platform values:', error)
       throw error // 让Bridge层处理错误

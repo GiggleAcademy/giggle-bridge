@@ -14,11 +14,11 @@ export interface PlatformInfo {
 }
 type CallNativeFn = (plugin: string, method: string, params?: any) => Promise<any>;
 export interface PreferencePlugin {
-    readValues(keys?: string[]): Promise<PlatformInfo>;
+    readValues(keys?: string[]): Promise<Partial<PlatformInfo>>;
 }
 export declare class PreferencePluginImpl implements PreferencePlugin {
     private callNative;
     constructor(callNative: CallNativeFn);
-    readValues(keys?: string[]): Promise<PlatformInfo>;
+    readValues(keys?: string[]): Promise<Partial<PlatformInfo>>;
 }
 export {};
