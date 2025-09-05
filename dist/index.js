@@ -63,12 +63,12 @@ class Bridge {
     }
     async requestPlatformInfoAsync() {
         if (this.isPlatformInited) {
-            console.log('🚀 Platform info already initialized, returning cached data');
+            console.log('🚀 Platform info already initialized, returning cached data', this.platformInfo);
             return this.platformInfo;
         }
         try {
             await this._fetchPlatformInfo();
-            console.log('✅ Platform info initialized successfully');
+            console.log('✅ Platform info initialized successfully', this.platformInfo);
             return this.platformInfo;
         }
         catch (error) {
