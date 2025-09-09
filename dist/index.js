@@ -1,11 +1,13 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.Bridge = void 0;
+exports.Bridge = exports.isInContainerization = void 0;
 require("./native-bridge");
 const router_plugin_1 = require("./router-plugin");
 const preference_plugin_1 = require("./preference-plugin");
 const IS_TEST = process.env.NODE_ENV === 'test';
 const IS_DEV = process.env.NODE_ENV === 'development';
+exports.isInContainerization = !!window.webkit?.messageHandlers?.giggleBridge ||
+    !!window.giggleBridge;
 class Bridge {
     constructor() {
         this.platformInfo = {

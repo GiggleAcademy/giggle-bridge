@@ -9,6 +9,15 @@ import {
 const IS_TEST = process.env.NODE_ENV === 'test'
 const IS_DEV = process.env.NODE_ENV === 'development'
 
+/**
+ * 检测是否在容器化环境中（原生应用的webview）
+ */
+export const isInContainerization: boolean =
+  // iOS WebKit 环境检测
+  !!(window as any).webkit?.messageHandlers?.giggleBridge ||
+  // Android 环境检测
+  !!(window as any).giggleBridge
+
 // Global window interface - Bridge实例（业务层）
 declare global {
   interface Window {

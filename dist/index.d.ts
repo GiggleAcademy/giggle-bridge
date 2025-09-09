@@ -1,5 +1,6 @@
 import './native-bridge';
 import { PlatformInfo } from './preference-plugin';
+export declare const isInContainerization: boolean;
 declare global {
     interface Window {
         GiggleBridgeAPI?: Bridge;
