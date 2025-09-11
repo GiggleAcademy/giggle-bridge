@@ -1,5 +1,6 @@
 import './native-bridge';
-import { PlatformInfo } from './preference-plugin';
+import { RouterPlugin } from './router-plugin';
+import { PreferencePlugin, PlatformInfo } from './preference-plugin';
 export declare const isInContainerization: boolean;
 declare global {
     interface Window {
@@ -7,8 +8,8 @@ declare global {
     }
 }
 declare class Bridge {
-    private router;
-    private preference;
+    private _router;
+    private _preference;
     platformInfo: PlatformInfo;
     isPlatformInited: boolean;
     constructor();
@@ -24,6 +25,8 @@ declare class Bridge {
     requestPlatformInfo(success: (info: PlatformInfo) => void, fail?: (error: any) => void): void;
     forceRefreshPlatformInfo(): Promise<PlatformInfo>;
     get pointsDescDoneBtn(): string;
+    get router(): RouterPlugin;
+    get preference(): PreferencePlugin;
 }
 declare const bridge: Bridge;
 export { RouterPlugin } from './router-plugin';

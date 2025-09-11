@@ -20,7 +20,7 @@ function initializeNativeBridge() {
                 console.log('GiggleBridge.callNative', message);
                 console.log('window.webkit?.messageHandlers?.giggleBridge', window.webkit?.messageHandlers?.giggleBridge);
                 if (window.webkit?.messageHandlers?.giggleBridge) {
-                    window.webkit.messageHandlers.giggleBridge.postMessage(message);
+                    window.webkit.messageHandlers.giggleBridge.postMessage(JSON.stringify(message));
                 }
                 else if (window.giggleBridge &&
                     window.giggleBridge.postMessage) {

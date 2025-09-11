@@ -69,22 +69,55 @@ bridge.requestPlatformInfo(
 ### 路由导航
 
 ```typescript
-// 游戏功能
+// 🚀 推荐：业务友好的API
 await bridge.playGame()
 await bridge.inviteFriends()
 await bridge.finishChallenge()
 await bridge.flashcardLearning()
 
-// 页面控制
-await bridge.dismiss({ reason: 'user_cancel' })
+// 🎛️ 界面控制
+await bridge.dismiss()
 await bridge.dismissLoading()
+```
+
+### 高级插件访问
+
+```typescript
+// 🔧 高级用户：直接插件访问（当需要自定义行为时）
+await bridge.router.route('giggleacademy://custom/action')
+const platformData = await bridge.preference.readValues()
+
+// 💡 通用原生调用
+await bridge.callNative('Router', 'customMethod', { param: 'value' })
 ```
 
 ## 📚 API 文档
 
-### Bridge 主要方法
+Bridge API 按功能分为四个主要类别，提供清晰的业务接口和高级插件访问模式：
 
-#### 平台信息
+### 🚀 Navigation APIs (业务导航接口)
+
+推荐的业务友好接口，封装了常用的导航功能：
+
+| 方法                  | 描述     | 返回值          |
+| --------------------- | -------- | --------------- |
+| `inviteFriends()`     | 邀请朋友 | `Promise<void>` |
+| `playGame()`          | 启动游戏 | `Promise<void>` |
+| `finishChallenge()`   | 完成挑战 | `Promise<void>` |
+| `flashcardLearning()` | 闪卡学习 | `Promise<void>` |
+
+### 🎛️ UI Control APIs (界面控制接口)
+
+用于控制应用界面状态：
+
+| 方法               | 描述         | 返回值          |
+| ------------------ | ------------ | --------------- |
+| `dismissLoading()` | 隐藏加载状态 | `Promise<void>` |
+| `dismiss()`        | 关闭页面     | `Promise<void>` |
+
+### 📱 Platform Info APIs (平台信息接口)
+
+获取和管理平台相关信息：
 
 | 方法                                  | 描述                    | 返回值                  |
 | ------------------------------------- | ----------------------- | ----------------------- |
@@ -95,18 +128,29 @@ await bridge.dismissLoading()
 | `isPlatformInited`                    | 是否已初始化            | `boolean`               |
 | `pointsDescDoneBtn`                   | 积分按钮状态            | `string`                |
 
-#### 路由控制
+### 🔧 Advanced Plugin Access (高级插件访问)
 
-| 方法                  | 描述         | 参数         | 返回值          |
-| --------------------- | ------------ | ------------ | --------------- |
-| `playGame()`          | 启动游戏     | -            | `Promise<void>` |
-| `inviteFriends()`     | 邀请朋友     | -            | `Promise<void>` |
-| `finishChallenge()`   | 完成挑战     | -            | `Promise<void>` |
-| `flashcardLearning()` | 闪卡学习     | -            | `Promise<void>` |
-| `dismiss(data?)`      | 关闭页面     | `data?: any` | `Promise<void>` |
-| `dismissLoading()`    | 隐藏加载状态 | -            | `Promise<void>` |
+> ⚠️ **注意**: 直接使用插件需要了解底层实现细节。推荐使用上面的业务API，除非你需要自定义行为。
 
-#### 通用调用
+#### Router Plugin 访问
+
+```typescript
+// 自定义路由
+await bridge.router.route('custom://scheme/action')
+
+// 直接调用原生方法
+await bridge.router.dismiss()
+await bridge.router.dismissLoading()
+```
+
+#### Preference Plugin 访问
+
+```typescript
+// 直接读取原生数据
+const data = await bridge.preference.readValues()
+```
+
+#### 通用原生调用
 
 | 方法                                  | 描述             | 参数                                           | 返回值         |
 | ------------------------------------- | ---------------- | ---------------------------------------------- | -------------- |
@@ -179,3 +223,50 @@ pnpm add github:GiggleAcademy/giggle-bridge#develop
 ```bash
 pnpm add github:GiggleAcademy/giggle-bridge
 ```
+
+## 💡 使用建议和最佳实践
+
+### API 选择指南
+
+#### 🎯 业务开发者（推荐）
+
+使用封装好的业务API，简洁易懂：
+
+```typescript
+// ✅ 推荐：语义清晰，易于维护
+await bridge.playGame()
+await bridge.inviteFriends()
+await bridge.dismissLoading()
+```
+
+#### 🔧 高级开发者
+
+当需要自定义行为或新功能时，使用插件访问：
+
+```typescript
+// ✅ 高级：灵活但需要了解底层细节
+await bridge.router.route('custom://scheme/newFeature')
+const customData = await bridge.preference.readValues()
+```
+
+### 架构优势
+
+- **🎯 业务友好**: 上层API直接表达业务意图
+- **🔧 灵活扩展**: 底层插件支持自定义需求
+- **🛡️ 类型安全**: 完整的TypeScript类型定义
+- **📦 模块化**: 清晰的插件分离架构
+- **🔄 向后兼容**: 支持回调和Promise两种模式
+
+### 迁移指南
+
+如果你之前使用的是直接插件访问，现在推荐迁移到业务API：
+
+```typescript
+// ❌ 旧方式：直接使用插件
+await bridge.router.route('giggleacademy://unity/playGame')
+
+// ✅ 新方式：业务API
+await bridge.playGame()
+```
+
+但高级插件访问依然可用，适合需要自定义行为的场景。
