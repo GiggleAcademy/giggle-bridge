@@ -28,8 +28,8 @@ class Bridge {
             greyScaleMode: '',
         };
         this.isPlatformInited = false;
-        this.router = new router_plugin_1.RouterPluginImpl(this.callNative.bind(this));
-        this.preference = new preference_plugin_1.PreferencePluginImpl(this.callNative.bind(this));
+        this._router = new router_plugin_1.RouterPluginImpl(this.callNative.bind(this));
+        this._preference = new preference_plugin_1.PreferencePluginImpl(this.callNative.bind(this));
     }
     callNative(plugin, method, params) {
         console.log(`🚀 GiggleBridge.callNative: ${plugin}.${method}`, params);
@@ -40,25 +40,25 @@ class Bridge {
         return Promise.resolve(null);
     }
     async inviteFriends() {
-        await this.router.route('giggleacademy://unity/inviteFriends');
+        await this._router.route('giggleacademy://unity/inviteFriends');
     }
     async playGame() {
-        await this.router.route('giggleacademy://unity/playGame');
+        await this._router.route('giggleacademy://unity/playGame');
     }
     async finishChallenge() {
-        await this.router.route('giggleacademy://unity/finishChallenge');
+        await this._router.route('giggleacademy://unity/finishChallenge');
     }
     async flashcardLearning() {
-        await this.router.route('giggleacademy://unity/flashcardLearning');
+        await this._router.route('giggleacademy://unity/flashcardLearning');
     }
     async dismissLoading() {
-        await this.router.dismissLoading();
+        await this._router.dismissLoading();
     }
     async dismiss() {
-        await this.router.dismiss();
+        await this._router.dismiss();
     }
     async _fetchPlatformInfo() {
-        const info = await this.preference.readValues();
+        const info = await this._preference.readValues();
         this.platformInfo = { ...this.platformInfo, ...info };
         this.isPlatformInited = true;
         return this.platformInfo;
@@ -95,6 +95,12 @@ class Bridge {
     }
     get pointsDescDoneBtn() {
         return this.platformInfo.pointsDescDoneBtn;
+    }
+    get router() {
+        return this._router;
+    }
+    get preference() {
+        return this._preference;
     }
 }
 exports.Bridge = Bridge;

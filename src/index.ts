@@ -26,8 +26,8 @@ declare global {
 }
 
 class Bridge {
-  private router: RouterPlugin
-  private preference: PreferencePlugin
+  private _router: RouterPlugin
+  private _preference: PreferencePlugin
 
   // Public platform info with default values
   public platformInfo: PlatformInfo = {
@@ -53,8 +53,8 @@ class Bridge {
 
   constructor() {
     // 初始化插件，传入callNative方法
-    this.router = new RouterPluginImpl(this.callNative.bind(this))
-    this.preference = new PreferencePluginImpl(this.callNative.bind(this))
+    this._router = new RouterPluginImpl(this.callNative.bind(this))
+    this._preference = new PreferencePluginImpl(this.callNative.bind(this))
   }
 
   /**
@@ -80,38 +80,47 @@ class Bridge {
     return Promise.resolve(null)
   }
 
-  // Navigation methods using Router plugin
+  // ========================================
+  // 🚀 Navigation APIs (业务导航接口)
+  // ========================================
+
   public async inviteFriends(): Promise<void> {
-    await this.router.route('giggleacademy://unity/inviteFriends')
+    await this._router.route('giggleacademy://unity/inviteFriends')
   }
 
   public async playGame(): Promise<void> {
-    await this.router.route('giggleacademy://unity/playGame')
+    await this._router.route('giggleacademy://unity/playGame')
   }
 
   public async finishChallenge(): Promise<void> {
-    await this.router.route('giggleacademy://unity/finishChallenge')
+    await this._router.route('giggleacademy://unity/finishChallenge')
   }
 
   public async flashcardLearning(): Promise<void> {
-    await this.router.route('giggleacademy://unity/flashcardLearning')
+    await this._router.route('giggleacademy://unity/flashcardLearning')
   }
 
-  // Loading control
+  // ========================================
+  // 🎛️ UI Control APIs (界面控制接口)
+  // ========================================
+
   public async dismissLoading(): Promise<void> {
-    await this.router.dismissLoading()
+    await this._router.dismissLoading()
   }
 
-  // Navigation control
   public async dismiss(): Promise<void> {
-    await this.router.dismiss()
+    await this._router.dismiss()
   }
+
+  // ========================================
+  // 📱 Platform Info APIs (平台信息接口)
+  // ========================================
 
   // Private method to fetch platform info from native
   private async _fetchPlatformInfo(): Promise<PlatformInfo> {
     // 获取PlatformInfo的所有key作为参数 - 业务逻辑在Bridge层处理
 
-    const info = await this.preference.readValues()
+    const info = await this._preference.readValues()
     // Update bridge's platform info - 只更新从原生获取的有效数据
     this.platformInfo = { ...this.platformInfo, ...info }
     this.isPlatformInited = true
@@ -164,6 +173,35 @@ class Bridge {
 
   public get pointsDescDoneBtn(): string {
     return this.platformInfo.pointsDescDoneBtn
+  }
+
+  // ========================================
+  // 🔧 Advanced Plugin Access (高级插件访问)
+  // ========================================
+  // 注意：直接使用插件可能需要了解底层实现细节
+  // 推荐使用上面的业务API，除非你需要自定义行为
+
+  /**
+   * 获取Router插件实例，用于高级路由控制
+   * @example
+   * // 自定义路由
+   * bridge.router.route('custom://scheme/action')
+   *
+   * // 直接调用原生方法
+   * bridge.router.dismiss()
+   */
+  public get router(): RouterPlugin {
+    return this._router
+  }
+
+  /**
+   * 获取Preference插件实例，用于高级偏好设置操作
+   * @example
+   * // 直接读取原生数据
+   * const data = await bridge.preference.readValues()
+   */
+  public get preference(): PreferencePlugin {
+    return this._preference
   }
 }
 
