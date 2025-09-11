@@ -66,7 +66,9 @@ export function initializeNativeBridge(): void {
 
         // iOS WebKit 调用
         if (window.webkit?.messageHandlers?.giggleBridge) {
-          window.webkit.messageHandlers.giggleBridge.postMessage(message)
+          window.webkit.messageHandlers.giggleBridge.postMessage(
+            JSON.stringify(message)
+          )
         }
         // Android 调用 - 假设Android也有类似的giggleBridge接口
         else if (
